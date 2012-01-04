@@ -19,22 +19,16 @@ ui_print("Flashing boot.img ...");
 assert(write_raw_image("/tmp/newboot.img", "boot"),
        delete("/tmp/boot.img"));
 
+ui_print("Restore Files...");
 mount("ext4", "EMMC", "/dev/block/mmcblk0p25", "/system");
 mount("ext4", "EMMC", "/dev/block/mmcblk0p26", "/data");
 delete_recursive("/system/lib/modules");
+delete("/system/xbin/mount.static");
+delete("/system/etc/init.d/70aufs");
 package_extract_dir("system", "/system");
-set_perm(0, 0, 0755, "/system/rmcallr.sh");
-run_program("/system/rmcallr.sh");
-delete("/system/rmcallr.sh");
-package_extract_dir("data", "/data");
-set_perm(0, 0, 0777, "/data/app/CallRecorder_v.1.0.27_alpha_build05.apk");
-unmount("/system");
-unmount("/data");
-
-mount("ext3", "EMMC", "/dev/block/mmcblk0p25", "/system");
-mount("ext3", "EMMC", "/dev/block/mmcblk0p26", "/data");
-delete_recursive("/system/lib/modules");
-package_extract_dir("system", "/system");
+set_perm(0, 0, 0755, "/system/xbin/mount.static");
+set_perm(0, 0, 0755, "/system/etc/init.d/70aufs");
+symlink("/system/etc/init.d/70aufs", "/system/xbin/aufs");
 set_perm(0, 0, 0755, "/system/rmcallr.sh");
 run_program("/system/rmcallr.sh");
 delete("/system/rmcallr.sh");
